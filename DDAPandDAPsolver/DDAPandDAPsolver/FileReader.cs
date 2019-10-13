@@ -39,8 +39,7 @@ namespace DDAPandDAPsolver
                     string result = reader.ReadToEnd();
                     //Change file to list of lines
                     fileLines = result.Split( new[] { Environment.NewLine }, StringSplitOptions.None ).ToList();
-                    //Set end of file sign
-                    //fileLines[fileLines.Count-1] = END_OF_FILE_SIGN;
+                    
 
                     #region ReadingNetworkParameters
                     _networkModel.CountOfLinks = int.Parse(SingleLineGetter());
@@ -51,6 +50,8 @@ namespace DDAPandDAPsolver
 
                     _networkModel.Demands = GetDemands();
                     #endregion
+
+                    var test= AdditionalFunctions.CalculateLinksCapacities(_networkModel);
                 }
             }
 
