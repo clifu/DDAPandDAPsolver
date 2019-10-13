@@ -8,9 +8,39 @@ namespace DDAPandDAPsolver.Models
 {
     class PathModel
     {
-        public PathModel()
-        {
+        private int demandId;
 
+        public int DemandId
+        {
+            get => demandId;
+            set => demandId = value;
+        }
+
+        private int pathId;
+
+        public int PathId
+        {
+            get => pathId;
+            set => pathId = value;
+        }
+
+        private List<int> edges = new List<int>();
+
+        public List<int> Edges
+        {
+            get => edges;
+            set => edges = value;
+        }
+
+        public PathModel(string definingLine, int demandId, int pathId)
+        {
+            this.demandId = demandId;
+            this.pathId = pathId;
+
+            definingLine.Split(' ').ToList().ForEach(x =>
+                    { if (x != "")
+                            edges.Add(int.Parse(x));
+                    });
         }
     }
 }
