@@ -37,7 +37,7 @@ namespace DDAPandDAPsolver.Models
             this.demandId = demandId;
             this.pathId = pathId;
 
-            definingLine.Split(' ').ToList().ForEach(x =>
+            definingLine.Split(' ').Skip(1).ToList().ForEach(x =>
                     { if (x != "")
                             edges.Add(int.Parse(x));
                     });
