@@ -9,10 +9,45 @@ namespace DDAPandDAPsolver.Models
     class LinkModel
     {
         private int startNode;
+
+        public int StartNode
+        {
+            get => startNode;
+            set => startNode = value;
+        }
+
         private int endNode;
+
+        public int EndNode
+        {
+            get => endNode;
+            set => endNode = value;
+        }
+
         private int nbOfFibrePairs;
+
+        public int NbOfFibrePairs
+        {
+            get => nbOfFibrePairs;
+            set => nbOfFibrePairs = value;
+        }
+
         private int fibrePairCost;
+
+        public int FibrePairCost
+        {
+            get => fibrePairCost;
+            set => fibrePairCost = value;
+        }
+
         private int nbOfLambdasInFibre;
+
+        public int NbOfLambdasInFibre
+        {
+            get => nbOfLambdasInFibre;
+            set => nbOfLambdasInFibre = value;
+        }
+
 
         public LinkModel(string definingLine)
         {
