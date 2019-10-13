@@ -51,7 +51,6 @@ namespace DDAPandDAPsolver
                     _networkModel.Demands = GetDemands();
                     #endregion
 
-                    var test= AdditionalFunctions.CalculateLinksCapacities(_networkModel);
                 }
             }
 
