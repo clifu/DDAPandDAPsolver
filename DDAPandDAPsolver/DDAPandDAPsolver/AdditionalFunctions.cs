@@ -9,7 +9,7 @@ namespace DDAPandDAPsolver
 {
     class AdditionalFunctions
     {
-        public static List<int> CalculateLinksCapacities(NetworkModel network)
+        public static List<int> CalculateLinksCapacities(NetworkModel network, SolutionModel solution)
         {
             var linkCapacities = FillTableWithZeros(network.CountOfLinks);
 
@@ -19,13 +19,13 @@ namespace DDAPandDAPsolver
                 {
                     foreach (var edge in path.Edges)
                     {
-                        //Here we get for ex. 1 5 8 -> that means that we add capacity for edge 1 5 and 8
-                        //TODO: needed value from solution
-                        linkCapacities[edge - 1] += 100;
+                        //Here we get for ex. 1 5 8 -> that means that we add capacity for edge 1 5 and 8      
+                        solution.XesDictionary.TryGetValue(new PModel(demand.DemandId, path.PathId), out int valueOfX);
+                        linkCapacities[edge - 1] += valueOfX;
                     }
                 }
             }
-        
+
             return linkCapacities.Select((x, index) => Decimal.ToInt32(Math.Ceiling((decimal)x / (decimal)network.Links[index].NbOfLambdasInFibre))).ToList();
         }
 
@@ -33,7 +33,7 @@ namespace DDAPandDAPsolver
         {
             var temporaryList = new List<int>();
 
-            for(int i=0; i < size; i++)
+            for (int i = 0; i < size; i++)
             {
                 temporaryList.Add(0);
             }
@@ -41,18 +41,40 @@ namespace DDAPandDAPsolver
             return temporaryList;
         }
 
-        public static ulong GetBinaryCoefficient(ulong N, ulong K)
+        public static List<int> FillListWithIndexes(int count)
         {
-            ulong r = 1;
-            ulong d;
-                if (K > N) return 0;
-                for (d = 1; d <= K; d++)
-                {
-                    r *= N--;
-                    r /= d;
-                }
+            List<int> combination = new List<int>();
+            for (int i = 0; i < count; i++)
+            {
+                combination.Add(i);
+            }
+            return combination;
+        }
+
+        public static int GetBinaryCoefficient(int N, int K)
+        {
+            int r = 1;
+            int d;
+            if (K > N) return 0;
+            for (d = 1; d <= K; d++)
+            {
+                r *= N--;
+                r /= d;
+            }
             return r;
         }
 
+        public static List<List<T>> GetPermutations<T>(
+                      List<List<T>> listOfLists)
+        {
+            var x = listOfLists.Skip(1)
+                .Aggregate(listOfLists.First()
+                        .Select(c => new List<T>() { c }),
+                    (previous, next) => previous
+                        .SelectMany(p => next.Select(d => new List<T>(p) { d }))).Distinct().ToList();
+            return x;
+        }
+
     }
+
 }

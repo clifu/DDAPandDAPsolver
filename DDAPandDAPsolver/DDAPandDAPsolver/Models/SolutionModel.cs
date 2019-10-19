@@ -9,9 +9,9 @@ namespace DDAPandDAPsolver
 {
     public class SolutionModel
     {
-        private float networkCost;
+        private double networkCost;
 
-        public float NetworkCost
+        public double NetworkCost
         {
             get => networkCost;
             set => networkCost = value;
@@ -26,18 +26,18 @@ namespace DDAPandDAPsolver
         }
 
         //x(d,p)=a PModel = (d,p), a = value
-        private Dictionary<PModel, int> xesList = new Dictionary<PModel, int>();
+        private Dictionary<PModel, int> xesDictionary = new Dictionary<PModel, int>();
 
-        public Dictionary<PModel, int> XesList
+        public Dictionary<PModel, int> XesDictionary
         {
-            get => xesList;
-            set => xesList = value;
+            get => xesDictionary;
+            set => xesDictionary = value;
         }
 
 
-        public SolutionModel(Dictionary<PModel, int> xesList)
+        public SolutionModel(Dictionary<PModel, int> xesDictionary)
         {
-            this.xesList = xesList;
+            this.xesDictionary = xesDictionary;
         }
 
 

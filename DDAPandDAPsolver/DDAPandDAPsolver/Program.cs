@@ -1,4 +1,5 @@
 using DDAPandDAPsolver.Models;
+using DDAPandDAPsolver.Algorithms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,10 @@ namespace DDAPandDAPsolver
             Console.WriteLine("Czas na zabawe!");
 
             FileReader fileReader = new FileReader(new NetworkModel());
-            fileReader.ReadFile("net12_1");
+            var BruteForce = new BruteForce(fileReader.ReadFile("net4"));
+            
+            var x = BruteForce.DDAP(BruteForce.PrepareSolutionsWithLinkCapacities());
+            Console.WriteLine($"{x.NetworkCost}");
             Console.ReadKey();
         }
     }
