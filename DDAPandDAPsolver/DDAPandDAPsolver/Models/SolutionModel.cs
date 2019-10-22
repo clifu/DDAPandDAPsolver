@@ -34,6 +34,14 @@ namespace DDAPandDAPsolver
             set => xesDictionary = value;
         }
 
+        private int capacityExceededLinksNumber;
+
+        public int CapacityExceededLinksNumber
+        {
+            get => capacityExceededLinksNumber;
+            set => capacityExceededLinksNumber = value;
+        }
+
 
         public SolutionModel(Dictionary<PModel, int> xesDictionary)
         {
