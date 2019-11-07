@@ -26,11 +26,6 @@ namespace DDAPandDAPsolver
             set => linkCapacities = value;
         }
 
-        public void SetCost(double cost)
-        {
-            this.networkCost = cost;
-        }
-
         //x(d,p)=a PModel = (d,p), a = value
         private Dictionary<PModel, int> xesDictionary = new Dictionary<PModel, int>();
 

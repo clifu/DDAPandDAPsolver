@@ -60,7 +60,7 @@ namespace DDAPandDAPsolver.Algorithms
 
             return _bestSolution;
         }
-
+               
         public List<SolutionModel> PrepareSolutionsWithLinkCapacities()
         {
             List<SolutionModel> solutions = PrepareSolutions();

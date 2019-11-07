@@ -17,7 +17,7 @@ namespace DDAPandDAPsolver
             FileReader fileReader = new FileReader(new NetworkModel());
             var BruteForce = new BruteForce(fileReader.ReadFile("net4"));
             
-            var x = BruteForce.DDAP(BruteForce.PrepareSolutionsWithLinkCapacities());
+            var x = BruteForce.DAP(BruteForce.PrepareSolutionsWithLinkCapacities());
             Console.WriteLine($"{x.NetworkCost}");
             Console.ReadKey();
         }
