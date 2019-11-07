@@ -10,7 +10,6 @@ namespace DDAPandDAPsolver
     public class SolutionModel
     {
         private double networkCost;
-        private Dictionary<PModel, int> mapOfValues;
 
         public double NetworkCost
         {
@@ -24,11 +23,6 @@ namespace DDAPandDAPsolver
         {
             get => linkCapacities;
             set => linkCapacities = value;
-        }
-
-        public void SetCost(double cost)
-        {
-            this.networkCost = cost;
         }
 
         //x(d,p)=a PModel = (d,p), a = value
@@ -50,7 +44,6 @@ namespace DDAPandDAPsolver
         }
 
 
-
         public SolutionModel(Dictionary<PModel, int> xesDictionary)
         {
             this.xesDictionary = xesDictionary;
@@ -60,7 +53,7 @@ namespace DDAPandDAPsolver
         {
             Dictionary<PModel, int> gene = new Dictionary<PModel, int>();
 
-            foreach(var entry in mapOfValues)
+            foreach(var entry in xesDictionary)
             {
                 if(Object.Equals(entry.Key.DemandId, geneID))
                 {
@@ -72,11 +65,10 @@ namespace DDAPandDAPsolver
 
         public int GetNumberOfGenes()
         {
-            var uniqueGenes = mapOfValues.Values.Distinct().ToList();
+            var uniqueGenes = xesDictionary.Values.Distinct().ToList();
 
             return uniqueGenes.Count;
         }
-
 
     }
 }

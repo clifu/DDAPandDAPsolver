@@ -64,8 +64,7 @@ namespace DDAPandDAPsolver
             return r;
         }
 
-        public static List<List<T>> GetPermutations<T>(
-                      List<List<T>> listOfLists)
+        public static List<List<T>> GetPermutations<T>(List<List<T>> listOfLists)
         {
             var x = listOfLists.Skip(1)
                 .Aggregate(listOfLists.First()
