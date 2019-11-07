@@ -236,14 +236,14 @@ namespace DDAPandDAPsolver.Algorithms
                    // population.ElementAt(i).NumberOfLinksWithExceededCapacity = //dokończyć
 
                 //zapisujemy najlepsze rozwiazanie w generacji
-                    if (population.ElementAt(i).NumberOfLinksWithExceededCapacity < bestSolutionOfGeneration.NumberOfLinksWithExceededCapacity)
+                    if (population.ElementAt(i).CapacityExceededLinksNumber < bestSolutionOfGeneration.CapacityExceededLinksNumber)
                     {
                         bestSolutionOfGeneration = population.ElementAt(i);
                     }
 
                 }
 
-                if (bestSolutionOfGeneration.NumberOfLinksWithExceededCapacity < bestSolution.NumberOfLinksWithExceededCapacity)
+                if (bestSolutionOfGeneration.CapacityExceededLinksNumber < bestSolution.CapacityExceededLinksNumber)
                 {
                     bestSolution = bestSolutionOfGeneration;
                     currentNumberOfContinuousNonBetterSolutions = 0;
@@ -259,10 +259,10 @@ namespace DDAPandDAPsolver.Algorithms
                 population = FillLinkCapacitiesForNewSolutions(population);
                 // nie możemy w tym momencie wybrac najlepszych bo nie są obliczone koszta (dlatego przed mutacja)
                 //System.out.println("Overload of generation " + currentGeneration + ": " + bestSolutionOfGeneration.getNumberOfLinksWithExceededCapacity()); przełożyć na c#
-                Console.WriteLine("Overload of generation " + currentGeneration + ": " + bestSolutionOfGeneration.NumberOfLinksWithExceededCapacity);
+                Console.WriteLine("Overload of generation " + currentGeneration + ": " + bestSolutionOfGeneration.CapacityExceededLinksNumber);
             }
             //System.out.println("Overload of best solution: " + bestSolution.getNumberOfLinksWithExceededCapacity()); przełożyć na C#
-            Console.WriteLine("Overload of best solution: " + bestSolution.NumberOfLinksWithExceededCapacity);
+            Console.WriteLine("Overload of best solution: " + bestSolution.CapacityExceededLinksNumber);
             return bestSolution;
         }
 
@@ -270,7 +270,7 @@ namespace DDAPandDAPsolver.Algorithms
         {
            int subListEnd = Convert.ToInt32(solutions.Count() * (percentOfBestChromosomes / 100));
 
-           List<SolutionModel> list0 = solutions.OrderBy(o=>o.NumberOfLinksWithExceededCapacity).ToList();
+           List<SolutionModel> list0 = solutions.OrderBy(o=>o.CapacityExceededLinksNumber).ToList();
 
            List<SolutionModel> list = new List<SolutionModel>();
 

@@ -11,7 +11,6 @@ namespace DDAPandDAPsolver
     {
         private double networkCost;
         private Dictionary<PModel, int> mapOfValues;
-        private int numberOfLinksWithExceededCapacity;
 
         public double NetworkCost
         {
@@ -35,6 +34,15 @@ namespace DDAPandDAPsolver
         //x(d,p)=a PModel = (d,p), a = value
         private Dictionary<PModel, int> xesDictionary = new Dictionary<PModel, int>();
 
+        private int capacityExceededLinksNumber;
+
+        public int CapacityExceededLinksNumber
+        {
+            get => capacityExceededLinksNumber;
+            set => capacityExceededLinksNumber = value;
+        }
+
+        
         public Dictionary<PModel, int> XesDictionary
         {
             get => xesDictionary;
@@ -72,12 +80,6 @@ namespace DDAPandDAPsolver
             var uniqueGenes = mapOfValues.Values.Distinct().ToList();
 
             return uniqueGenes.Count;
-        }
-
-        public int NumberOfLinksWithExceededCapacity
-        {
-            get => numberOfLinksWithExceededCapacity;
-            set => numberOfLinksWithExceededCapacity = value;
         }
 
 
