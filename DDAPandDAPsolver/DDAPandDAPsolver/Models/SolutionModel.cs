@@ -26,6 +26,11 @@ namespace DDAPandDAPsolver
             set => linkCapacities = value;
         }
 
+        public void SetCost(double cost)
+        {
+            this.networkCost = cost;
+        }
+
         //x(d,p)=a PModel = (d,p), a = value
         private Dictionary<PModel, int> xesDictionary = new Dictionary<PModel, int>();
 
@@ -44,11 +49,6 @@ namespace DDAPandDAPsolver
             set => xesDictionary = value;
         }
 
-        public Dictionary<PModel, int> MapOfValues
-        {
-            get => mapOfValues;
-            set => mapOfValues = value;
-        }
 
 
         public SolutionModel(Dictionary<PModel, int> xesDictionary)
