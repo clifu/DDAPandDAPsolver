@@ -42,5 +42,6 @@ namespace DDAPandDAPsolver.Models
                             edges.Add(int.Parse(x));
                     });
         }
+
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace DDAPandDAPsolver.Models
 {
     class DemandModel
@@ -81,5 +82,6 @@ namespace DDAPandDAPsolver.Models
             #endregion
 
         }
+
     }
 }

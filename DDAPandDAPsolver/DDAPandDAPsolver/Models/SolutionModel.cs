@@ -10,6 +10,8 @@ namespace DDAPandDAPsolver
     public class SolutionModel
     {
         private double networkCost;
+        private Dictionary<PModel, int> mapOfValues;
+        private int numberOfLinksWithExceededCapacity;
 
         public double NetworkCost
         {
@@ -25,6 +27,11 @@ namespace DDAPandDAPsolver
             set => linkCapacities = value;
         }
 
+        public void SetCost(double cost)
+        {
+            this.networkCost = cost;
+        }
+
         //x(d,p)=a PModel = (d,p), a = value
         private Dictionary<PModel, int> xesDictionary = new Dictionary<PModel, int>();
 
@@ -34,10 +41,43 @@ namespace DDAPandDAPsolver
             set => xesDictionary = value;
         }
 
+        public Dictionary<PModel, int> MapOfValues
+        {
+            get => mapOfValues;
+            set => mapOfValues = value;
+        }
+
 
         public SolutionModel(Dictionary<PModel, int> xesDictionary)
         {
             this.xesDictionary = xesDictionary;
+        }
+
+        public Dictionary<PModel, int> GetGene(int geneID)
+        {
+            Dictionary<PModel, int> gene = new Dictionary<PModel, int>();
+
+            foreach(var entry in mapOfValues)
+            {
+                if(Object.Equals(entry.Key.DemandId, geneID))
+                {
+                    gene.Add(entry.Key, entry.Value);
+                }
+            }
+            return gene;
+        }
+
+        public int GetNumberOfGenes()
+        {
+            var uniqueGenes = mapOfValues.Values.Distinct().ToList();
+
+            return uniqueGenes.Count;
+        }
+
+        public int NumberOfLinksWithExceededCapacity
+        {
+            get => numberOfLinksWithExceededCapacity;
+            set => numberOfLinksWithExceededCapacity = value;
         }
 
 

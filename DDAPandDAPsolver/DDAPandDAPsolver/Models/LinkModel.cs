@@ -58,6 +58,6 @@ namespace DDAPandDAPsolver.Models
             fibrePairCost = int.Parse(values[3]);
             nbOfLambdasInFibre = int.Parse(values[4]);
         }
-        
+
     }
 }

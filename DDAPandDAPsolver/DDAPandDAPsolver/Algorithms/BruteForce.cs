@@ -17,6 +17,22 @@ namespace DDAPandDAPsolver.Algorithms
             _networkModel = network;
         }
 
+        public SolutionModel DAP(List<SolutionModel> solutions)
+        {
+            foreach (var solution in solutions)
+            {
+                var values = new List<int>();
+                for (int i = 0; i < solution.LinkCapacities.Count; i++)
+                {
+                    values.Add(Math.Max(solution.LinkCapacities.ElementAt(i) - _networkModel.Links.ElementAt(i).NbOfFibrePairs,0));
+                }
+                solution.CapacityExceededLinksNumber = values.Where(x => x > 0).ToList().Count;
+                if (values.Max() == 0)
+                    return solution;            
+            }
+            return null;
+        }
+
         public SolutionModel DDAP(List<SolutionModel> solutions)
         {
             Double finalCost = Double.MaxValue;
@@ -44,7 +60,6 @@ namespace DDAPandDAPsolver.Algorithms
 
             return _bestSolution;
         }
-
 
         public List<SolutionModel> PrepareSolutionsWithLinkCapacities()
         {
