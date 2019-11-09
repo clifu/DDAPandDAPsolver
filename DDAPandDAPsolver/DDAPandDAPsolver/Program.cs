@@ -22,7 +22,7 @@ namespace DDAPandDAPsolver
             int maxMutationNumber = 50;
             int maxNumberOfContinuousNonBetterSolutions = 20;
             int maxTime = 50;
-            NetworkModel network = fileReader.ReadFile("net4");
+            NetworkModel network = fileReader.ReadFile("net12_1");
             int population = 50;
             int maxNumberOfGenerations = 6;
             float pCross = 0.6f;

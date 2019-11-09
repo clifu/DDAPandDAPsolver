@@ -34,6 +34,7 @@ namespace DDAPandDAPsolver.Algorithms
         {
             this.pCross=pCross;
             this.maxTime=maxTime;
+            this.pMutate = pMutate;
             this.numberOfChromosomes = numberOfChromosomes;
             this.percentOfBestChromosomes = percentOfBestChromosomes;
             this.numberOfGenerations = numberOfGenerations;
@@ -186,7 +187,6 @@ namespace DDAPandDAPsolver.Algorithms
                 combinations.Add(singleCombination);
             }
 
-            //return lists; // trzeba zmienić bo u nich jest skomplikowany return
             return AdditionalFunctions.GetPermutations(combinations).Where(x => x.Sum() == sum).ToList();
         }
 
@@ -212,29 +212,19 @@ namespace DDAPandDAPsolver.Algorithms
             return list;
         }
 
-        private int CalculateNewtonSymbol(int n, int k)
-        {
-            int result = 1;
-            for (int i = 1; i <= k; i++)
-            {
-                result = result * (n - i + 1) / i;
-            }
-            return result;
-        }
-
         public SolutionModel ComputeDAP()
         {
             List<SolutionModel> population = GetInitialRandomPopulation(numberOfChromosomes, seed);
 
             var bestSolution = new SolutionModel(new Dictionary<PModel, int>());
-            bestSolution.NetworkCost = Double.MaxValue;
+            bestSolution.CapacityExceededLinksNumber = int.MaxValue;
 
             //endTime = System.currentTimeMillis() + maxTime * 1000; - po chuj to
             while (ComputeStopCriterion())
             {
                 currentGeneration++;
                 SolutionModel bestSolutionOfGeneration = new SolutionModel(new Dictionary<PModel, int>());
-                bestSolutionOfGeneration.NetworkCost = Double.MaxValue;
+                bestSolutionOfGeneration.CapacityExceededLinksNumber = int.MaxValue;
 
                 for (int i = 0; i < population.Count; i++)
                 {
@@ -243,9 +233,10 @@ namespace DDAPandDAPsolver.Algorithms
                     for (int j = 0; j < population.ElementAt(i).LinkCapacities.Count; j++)
                     {
                         maxValues.Add(Math.Max(0, population.ElementAt(i).LinkCapacities.ElementAt(j) - networkModel.Links.ElementAt(j).NbOfFibrePairs));
-                    }         
+                    }
                     //population.ElementAt(i).SetCost(cost);
-                   // population.ElementAt(i).NumberOfLinksWithExceededCapacity = //dokończyć
+                    // population.ElementAt(i).NumberOfLinksWithExceededCapacity = //dokończyć
+                    population.ElementAt(i).CapacityExceededLinksNumber = maxValues.Select(x => x > 0).ToList().Count;
 
                 //zapisujemy najlepsze rozwiazanie w generacji
                     if (population.ElementAt(i).CapacityExceededLinksNumber < bestSolutionOfGeneration.CapacityExceededLinksNumber)
@@ -284,12 +275,8 @@ namespace DDAPandDAPsolver.Algorithms
 
            List<SolutionModel> list0 = solutions.OrderBy(o=>o.CapacityExceededLinksNumber).ToList();
 
-           List<SolutionModel> list = new List<SolutionModel>();
 
-           for(int i=0; i<=subListEnd;i++)
-           {
-                list.Add(list0.ElementAt(i));
-           }
+           List<SolutionModel> list = solutions.OrderBy(o => o.CapacityExceededLinksNumber).ToList().GetRange(0, subListEnd);
 
            // Dopełniamy najlepszymi, aby populacja nie zmalała
            list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); // powinno być git jak sie to powyżej rozkmini - chyba jest git
@@ -298,7 +285,6 @@ namespace DDAPandDAPsolver.Algorithms
 
         }
 
-        //TODO
         private List<SolutionModel> TakeBestDDAP(List<SolutionModel> solutions, float percentOfBestChromosomes)
         {
             // Wybieramy x procent najlepszych
@@ -306,13 +292,7 @@ namespace DDAPandDAPsolver.Algorithms
 
            List<SolutionModel> list0 = solutions.OrderBy(o=>o.NetworkCost).ToList();
            Console.WriteLine("list0.Count: " + list0.Count);
-           List<SolutionModel> list = new List<SolutionModel>();
-
-           for(int i=0; i<=subListEnd;i++)
-           {
-                list.Add(list0.ElementAt(i));
-           }
-
+           List<SolutionModel> list = solutions.OrderBy(o => o.NetworkCost).ToList().GetRange(0, subListEnd);
            // Dopełniamy najlepszymi, aby populacja nie zmalała
            list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); // powinno być git jak sie to powyżej rozkmini - chyba jest git
 
@@ -324,10 +304,9 @@ namespace DDAPandDAPsolver.Algorithms
         {
             var children = new List<SolutionModel>();
 
-            int parentsSize = parents.Count;
             //w jednej iteracji krzyżowanie 2 rodziców z listy, wiec liczba iteracji / 2
             // wywalamy rodzicow z listy i bierzemy kolejnych 2
-            for (int i = 0; i < parentsSize / 2; i++)
+            for (int i = 0; i < parents.Count / 2; i++)
             {
                 int index1 = random.Next(1, parents.Count) - 1;
                 int index2 = random.Next(1, parents.Count) - 1;
@@ -437,8 +416,8 @@ namespace DDAPandDAPsolver.Algorithms
 
                 if (values.ElementAt(i0) != 0)
                 {
-                    values[i0] = values.ElementAt(i0 - 1);
-                    values[i1] = values.ElementAt(i1 + 1);
+                    values[i0] = values.ElementAt(i0) - 1;
+                    values[i1] = values.ElementAt(i1) + 1;
                     break;
                 }
             }
@@ -467,12 +446,9 @@ namespace DDAPandDAPsolver.Algorithms
 
             for (int i = 0; i < solutions.Count; i++)
             {
-                if (solutions.ElementAt(i).LinkCapacities == null) // sprawdzić czy to jest też git w C#
+                if (solutions.ElementAt(i).LinkCapacities.Count == 0) // sprawdzić czy to jest też git w C#
                 {
-                    //TODO - tak jest w ich kodzie w javie, o cokolwiek chodzi
-                    //solutions.ElementAt(i).SetCapacitiesOfLinks(linksCapacities.ElementAt(i)); źle
-                    solutions.ElementAt(i).LinkCapacities = linksCapacities.ElementAt(i); //dobrze
-
+                   solutions.ElementAt(i).LinkCapacities = linksCapacities.ElementAt(i); //dobrze
                 }
             }
             return solutions;
