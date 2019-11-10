@@ -65,9 +65,12 @@ namespace DDAPandDAPsolver
 
         public int GetNumberOfGenes()
         {
-            var uniqueGenes = xesDictionary.Values.Distinct().ToList();
-
-            return uniqueGenes.Count;
+            var uniqueDemandIds = new HashSet<int>();
+            foreach(var key in xesDictionary.Keys)
+            {
+                uniqueDemandIds.Add(key.DemandId);
+            }
+            return uniqueDemandIds.Count;
         }
 
     }

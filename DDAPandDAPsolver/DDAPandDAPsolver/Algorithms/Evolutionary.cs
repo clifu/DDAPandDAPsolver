@@ -10,7 +10,6 @@ namespace DDAPandDAPsolver.Algorithms
     class Evolutionary
     {
         private NetworkModel networkModel;
-        private SolutionModel solutionModel;
         private int maxTime;
         private int seed;
         private float pCross;
@@ -52,23 +51,31 @@ namespace DDAPandDAPsolver.Algorithms
         public bool ComputeStopCriterion()
         {
             if (Environment.TickCount >= this.endTime)
+            {
                 return false;
+            }
 
             if (this.currentGeneration >= this.numberOfGenerations)
+            {
                 return false;
+            }
 
             if (this.currentMutation >= this.maxMutationNumber)
+            {
                 return false;
+            }
 
             if (this.currentNumberOfContinuousNonBetterSolutions >= this.maxNumberOfContinuousNonBetterSolutions)
+            {
                 return false;
+            }
 
             return true;
             }
 
         public SolutionModel ComputeDDAP()
         {
-            List<SolutionModel> population = GetInitialRandomPopulation(numberOfChromosomes, seed); //zaimplementować
+            List<SolutionModel> population = GetInitialRandomPopulation(numberOfChromosomes, seed);
             SolutionModel bestSolution = new SolutionModel(new Dictionary<PModel, int>());
             bestSolution.NetworkCost = Double.MaxValue; //ustawiamy koszt na nieskonczonosc
 
@@ -83,15 +90,12 @@ namespace DDAPandDAPsolver.Algorithms
                 for (int i = 0; i < population.Count; i++)
                 {
                     double cost = 0;
-                    //List<int> costsOfLinks = population.ElementAt(i).GetCapacitiesOfLinks(); //źle
-                    List<int> costsOfLinks = population.ElementAt(i).LinkCapacities; //dobrze
+                    List<int> costsOfLinks = population.ElementAt(i).LinkCapacities;
 
-                    for (int j = 0; j < population.ElementAt(i).LinkCapacities.Count(); j++)
+                    for (int j = 0; j < population.ElementAt(i).LinkCapacities.Count; j++)
                     {
-                        //cost += network.getLinks().get(j).getModule().getCost() * costsOfLinks.get(j); //ogarnąć te gety jebane
-                        cost += networkModel.Links.ElementAt(j).FibrePairCost * costsOfLinks.ElementAt(j); //ogarnięte
+                        cost += networkModel.Links.ElementAt(j).FibrePairCost * costsOfLinks.ElementAt(j);
                     }         
-                    //population.ElementAt(i).SetCost(cost);
                     population.ElementAt(i).NetworkCost = cost;
 
 
@@ -109,29 +113,23 @@ namespace DDAPandDAPsolver.Algorithms
                     {
                         currentNumberOfContinuousNonBetterSolutions++;
                     }
-
                     population = TakeBestDDAP(population, percentOfBestChromosomes); 
                     population = Crossover(population, seed, pCross); 
                     population = Mutation(population, seed, pMutate);
                     population = FillLinkCapacitiesForNewSolutions(population);
+
+                    Console.WriteLine("Cost of generation: " + bestSolutionOfGeneration.NetworkCost);
                     Console.WriteLine("Cost of best solution: " + bestSolution.NetworkCost);
 
                     // nie możemy w tym momencie wybrac najlepszych bo nie są obliczone koszta (dlatego przed mutacja)
-                    // System.out.println("Cost of generation " + currentGeneration + ": " + bestSolutionOfGeneration.getCost()); - przekonwertować na c#
                 }
-                //System.out.println("Cost of best solution: " + bestSolution.getCost()); - przekonwertować na c#
                 Console.WriteLine("Cost of best solution: " + bestSolution.NetworkCost);
                 return bestSolution;
             }
 
-        //TODO
         public List<SolutionModel> GetInitialRandomPopulation(int numberOfChromosomes, double seed)
         {
-            //List<List<Solution>> allCombinations = network.getDemands().stream().map(this::getCombinationsOfOneDemand)
-            //.collect(Collectors.toList()); //wkłada każdy demand do funkcji getCombi...
             var allCombinations = new List<List<SolutionModel>>();//dokonczyc
-
-            Console.WriteLine("numberOfChromosomes: " + numberOfChromosomes);
 
             foreach(var demand in networkModel.Demands)
             {
@@ -145,6 +143,12 @@ namespace DDAPandDAPsolver.Algorithms
                 SolutionModel chromosome = new SolutionModel(new Dictionary<PModel, int>());
                 for(int j=0; j<allCombinations.Count; j++)
                 {
+                    //ten if moze nie byc dobry ale przynajmniej nie wywala sie program teraz
+                    if(allCombinations.ElementAt(j).Count == 0)
+                    {
+                        allCombinations.RemoveAt(j);
+                    }
+
                     foreach(var entry in allCombinations.ElementAt(j).ElementAt(random.Next(allCombinations.ElementAt(j).Count)).XesDictionary)
                     {
                         chromosome.XesDictionary.Add(entry.Key, entry.Value);
@@ -168,7 +172,7 @@ namespace DDAPandDAPsolver.Algorithms
                 routingPossibilities.ElementAt(rand).LinkCapacities = linksCapacities.ElementAt(rand);
                 list.Add(routingPossibilities.ElementAt(rand));
             }
-
+            Console.WriteLine("list.Count: " + list.Count);
             return list;
         }
 
@@ -197,8 +201,7 @@ namespace DDAPandDAPsolver.Algorithms
             //int numberOfCombinations = CalculateNewtonSymbol(demand.NumberOfPaths + demand.DemandVolume - 1, demand.DemandVolume);
             var numberOfCombinations = AdditionalFunctions.GetBinaryCoefficient(demand.NumberOfPaths + demand.DemandVolume - 1, demand.DemandVolume);
             List<List<int>> combinations = GetCombinations(demand.DemandVolume, demand.NumberOfPaths);
-            //Console.WriteLine("number of combinations: " + numberOfCombinations);
-            //Console.WriteLine("demand.NumberOfPaths: " + demand.NumberOfPaths);
+
             for (int i = 0; i < numberOfCombinations; i++) {
                 var mapOfValuesForOneDemand = new Dictionary<PModel, int>();
 
@@ -219,7 +222,7 @@ namespace DDAPandDAPsolver.Algorithms
             var bestSolution = new SolutionModel(new Dictionary<PModel, int>());
             bestSolution.CapacityExceededLinksNumber = int.MaxValue;
 
-            //endTime = System.currentTimeMillis() + maxTime * 1000; - po chuj to
+            endTime = Environment.TickCount + maxTime * 1000;
             while (ComputeStopCriterion())
             {
                 currentGeneration++;
@@ -228,15 +231,19 @@ namespace DDAPandDAPsolver.Algorithms
 
                 for (int i = 0; i < population.Count; i++)
                 {
+                    int k = 0;
                     var maxValues = new List<int>();
-                    //List<int> costsOfLinks = population.ElementAt(i).GetCapacitiesOfLinks(); //źle
                     for (int j = 0; j < population.ElementAt(i).LinkCapacities.Count; j++)
                     {
                         maxValues.Add(Math.Max(0, population.ElementAt(i).LinkCapacities.ElementAt(j) - networkModel.Links.ElementAt(j).NbOfFibrePairs));
+                        if(Math.Max(0, population.ElementAt(i).LinkCapacities.ElementAt(j) - networkModel.Links.ElementAt(j).NbOfFibrePairs) > 0)
+                        {
+                            k++;
+                        }
                     }
-                    //population.ElementAt(i).SetCost(cost);
-                    // population.ElementAt(i).NumberOfLinksWithExceededCapacity = //dokończyć
-                    population.ElementAt(i).CapacityExceededLinksNumber = maxValues.Select(x => x > 0).ToList().Count;
+
+                    //population.ElementAt(i).CapacityExceededLinksNumber = maxValues.Select(x => x > 0).ToList().Count;
+                    population.ElementAt(i).CapacityExceededLinksNumber = k;
 
                 //zapisujemy najlepsze rozwiazanie w generacji
                     if (population.ElementAt(i).CapacityExceededLinksNumber < bestSolutionOfGeneration.CapacityExceededLinksNumber)
@@ -258,13 +265,11 @@ namespace DDAPandDAPsolver.Algorithms
                 population = TakeBestDAP(population, percentOfBestChromosomes); //zaimplementować
                 population = Crossover(population, seed, pCross);
                 population = Mutation(population, seed, pMutate);
-
                 population = FillLinkCapacitiesForNewSolutions(population);
+
                 // nie możemy w tym momencie wybrac najlepszych bo nie są obliczone koszta (dlatego przed mutacja)
-                //System.out.println("Overload of generation " + currentGeneration + ": " + bestSolutionOfGeneration.getNumberOfLinksWithExceededCapacity()); przełożyć na c#
                 Console.WriteLine("Overload of generation " + currentGeneration + ": " + bestSolutionOfGeneration.CapacityExceededLinksNumber);
             }
-            //System.out.println("Overload of best solution: " + bestSolution.getNumberOfLinksWithExceededCapacity()); przełożyć na C#
             Console.WriteLine("Overload of best solution: " + bestSolution.CapacityExceededLinksNumber);
             return bestSolution;
         }
@@ -279,7 +284,7 @@ namespace DDAPandDAPsolver.Algorithms
            List<SolutionModel> list = solutions.OrderBy(o => o.CapacityExceededLinksNumber).ToList().GetRange(0, subListEnd);
 
            // Dopełniamy najlepszymi, aby populacja nie zmalała
-           list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); // powinno być git jak sie to powyżej rozkmini - chyba jest git
+           list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); // chyba jest git
 
            return list;
 
@@ -288,15 +293,14 @@ namespace DDAPandDAPsolver.Algorithms
         private List<SolutionModel> TakeBestDDAP(List<SolutionModel> solutions, float percentOfBestChromosomes)
         {
             // Wybieramy x procent najlepszych
-           int subListEnd = Convert.ToInt32(solutions.Count() * (percentOfBestChromosomes / 100));
+           int subListEnd = Convert.ToInt32(solutions.Count * (percentOfBestChromosomes / 100));
 
            List<SolutionModel> list0 = solutions.OrderBy(o=>o.NetworkCost).ToList();
-           Console.WriteLine("list0.Count: " + list0.Count);
            List<SolutionModel> list = solutions.OrderBy(o => o.NetworkCost).ToList().GetRange(0, subListEnd);
            // Dopełniamy najlepszymi, aby populacja nie zmalała
-           list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); // powinno być git jak sie to powyżej rozkmini - chyba jest git
+           list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); // chyba jest git
 
-            return list;
+           return list;
         }
 
         //TODO
@@ -304,9 +308,11 @@ namespace DDAPandDAPsolver.Algorithms
         {
             var children = new List<SolutionModel>();
 
+            int parentsSize = parents.Count;
+
             //w jednej iteracji krzyżowanie 2 rodziców z listy, wiec liczba iteracji / 2
             // wywalamy rodzicow z listy i bierzemy kolejnych 2
-            for (int i = 0; i < parents.Count / 2; i++)
+            for (int i = 0; i < parentsSize / 2; i++)
             {
                 int index1 = random.Next(1, parents.Count) - 1;
                 int index2 = random.Next(1, parents.Count) - 1;
@@ -330,40 +336,42 @@ namespace DDAPandDAPsolver.Algorithms
 
             if (rand < probabilityOfCrossover)
             {
-                //children = new List<SolutionModel>(); <- niepotrzebne?
 
                 children.Add(new SolutionModel(new Dictionary<PModel, int>()));
                 children.Add(new SolutionModel(new Dictionary<PModel, int>()));
 
-                for (int i = 0; i < parent0.GetNumberOfGenes(); i++) // zaimplementować w SolutionModel getNumberOfGenes()
+                for (int i = 0; i < parent0.GetNumberOfGenes(); i++)
                 {
                     rand = random.NextDouble();
                     if (rand > 0.5)
                     {
                         foreach(var entry in parent0.GetGene(i+1))
                         {
-                            //children.ElementAt(0).MapOfValues.Add(parent0.GetGene(i + 1)); // dokończyć getGene i to bo rzuca errorem
                             children.ElementAt(0).XesDictionary.Add(entry.Key,entry.Value);
                         }
                         foreach(var entry in parent1.GetGene(i+1))
                         {
-                            children.ElementAt(1).XesDictionary.Add(entry.Key,entry.Value); //dokonczyc GetGene
+                            children.ElementAt(1).XesDictionary.Add(entry.Key,entry.Value);
                         }
 
                     } else
                     {
                         foreach(var entry in parent0.GetGene(i+1))
                         {
-                            children.ElementAt(1).XesDictionary.Add(entry.Key,entry.Value); // zrobić getGene()
+                            children.ElementAt(1).XesDictionary.Add(entry.Key,entry.Value);
                         }
                         foreach(var entry in parent1.GetGene(i+1))
                         {
-                            children.ElementAt(0).XesDictionary.Add(entry.Key,entry.Value); // zrobić getGene()
+                            children.ElementAt(0).XesDictionary.Add(entry.Key,entry.Value);
                         }
                     }
                 }
+                return children;
             }
-            return children;
+            var solutions = new List<SolutionModel>();
+            solutions.Add(parent0);
+            solutions.Add(parent1);
+            return solutions;
         }
 
         //TODO
@@ -378,13 +386,13 @@ namespace DDAPandDAPsolver.Algorithms
                 if (rand < probabilityOfMutation)
                 {
                     currentMutation++;
-
+                    //Console.WriteLine("currentMutation: " + currentMutation);
                     var genes = new Dictionary<PModel, int>();
                     for (int j = 0; j < population.ElementAt(i).GetNumberOfGenes(); j++)
                     {
                         foreach(var entry in MutateGene(population.ElementAt(i).GetGene(j + 1)))
                         {
-                            genes.Add(entry.Key, entry.Value); //może git może nie nie wiem
+                            genes.Add(entry.Key, entry.Value);
                         }
                     }
                     mutants.Add(new SolutionModel(genes));
@@ -433,10 +441,6 @@ namespace DDAPandDAPsolver.Algorithms
 
         private List<SolutionModel> FillLinkCapacitiesForNewSolutions(List<SolutionModel> solutions)
         {
-            //List<List<Integer>> linksCapacities = solutions.stream()
-            //                                                .map(this::computeLinksCapacitiesOfSolution)
-            //                                                .collect(Collectors.toList()); przełożyć na C#
-
 
             List<List<int>> linksCapacities = new List<List<int>>();
             foreach(var solution in solutions)
@@ -446,45 +450,13 @@ namespace DDAPandDAPsolver.Algorithms
 
             for (int i = 0; i < solutions.Count; i++)
             {
-                if (solutions.ElementAt(i).LinkCapacities.Count == 0) // sprawdzić czy to jest też git w C#
+                if (solutions.ElementAt(i).LinkCapacities.Count == 0)
                 {
-                   solutions.ElementAt(i).LinkCapacities = linksCapacities.ElementAt(i); //dobrze
+                   solutions.ElementAt(i).LinkCapacities = linksCapacities.ElementAt(i);
                 }
             }
             return solutions;
         }
-
-        /*private List<int> computeLinksCapacitiesOfSolution(SolutionModel solution)
-        {
-            var linksCapacities = new List<int>();
-            for (int i = 0; i < networkModel.Links.Count(); i++)
-            {
-                linksCapacities.Add(0);
-            }
-
-            var paths = new List<PathModel>();
-            foreach(DemandModel demand in networkModel.Demands)
-            {
-                paths.AddRange(demand.Paths);
-            }
-
-            for (int j=0; networkModel.Links.Count; j++)
-            {
-                double sum = 0;
-                foreach(PathModel path in paths)
-                {
-                    //List<Integer> list = Arrays.stream(path.getLinks()).boxed().collect(Collectors.toList()); // ogarnąć jebane streamy
-                    if (list.Contains(j+1))
-                    {
-                        sum += solution.MapOfValues[new PModel(path.DemandId, pathId)];
-                    }
-                }
-                //linksCapacities.set(j, (int) Math.ceil(sum / (double) network.getLinks().get(j).getLinkModule())); //ogarnąąąąć
-                linksCapacities[j] = Convert.ToInt32(Math.Ceiling(sum / Convert.ToDouble(networkModel.Links[j].NbOfLambdasInFibre)));
-                //return linkCapacities.Select((x, index) => Decimal.ToInt32(Math.Ceiling((decimal)x / (decimal)network.Links[index].NbOfLambdasInFibre))).ToList(); //tak Damian zrobil
-            }
-            return linksCapacities;
-        }*/
 
     }
 }
