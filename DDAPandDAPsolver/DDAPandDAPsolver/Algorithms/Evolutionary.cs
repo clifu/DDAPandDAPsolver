@@ -23,10 +23,11 @@ namespace DDAPandDAPsolver.Algorithms
         private int numberOfGenerations;
         private int maxMutationNumber;
 
-    // aktualny stan
         private int currentGeneration;
         private int currentMutation;
         private int currentNumberOfContinuousNonBetterSolutions;
+
+        public int CurrentGeneration { get => currentGeneration; set => currentGeneration = value; }
 
         public Evolutionary(float pCross, float pMutate, int maxTime, int numberOfChromosomes, float percentOfBestChromosomes, int numberOfGenerations,
                                  int maxMutationNumber, int maxNumberOfContinuousNonBetterSolutions, int seed, NetworkModel network)
@@ -43,7 +44,7 @@ namespace DDAPandDAPsolver.Algorithms
             this.random = new Random(seed);
             this.networkModel = network;
 
-            this.currentGeneration = 0;
+            this.CurrentGeneration = 0;
             this.currentNumberOfContinuousNonBetterSolutions = 0;
             this.currentMutation = 0;
         }
@@ -55,7 +56,7 @@ namespace DDAPandDAPsolver.Algorithms
                 return false;
             }
 
-            if (this.currentGeneration >= this.numberOfGenerations)
+            if (this.CurrentGeneration >= this.numberOfGenerations)
             {
                 return false;
             }
@@ -82,8 +83,8 @@ namespace DDAPandDAPsolver.Algorithms
             endTime = Environment.TickCount + maxTime * 1000;
             while (ComputeStopCriterion())
             {
-                currentGeneration++;
-                Console.WriteLine("currentGeneration: " + currentGeneration);
+                CurrentGeneration++;
+                Console.WriteLine("currentGeneration: " + CurrentGeneration);
                 SolutionModel bestSolutionOfGeneration = new SolutionModel(new Dictionary<PModel, int>());
                 bestSolutionOfGeneration.NetworkCost = Double.MaxValue;
                     
@@ -109,7 +110,9 @@ namespace DDAPandDAPsolver.Algorithms
                     {
                         bestSolution = bestSolutionOfGeneration;
                         currentNumberOfContinuousNonBetterSolutions = 0;
-                    } else
+                    if (bestSolution.NetworkCost == 0)
+                    { return bestSolution; };
+                } else
                     {
                         currentNumberOfContinuousNonBetterSolutions++;
                     }
@@ -118,18 +121,18 @@ namespace DDAPandDAPsolver.Algorithms
                     population = Mutation(population, seed, pMutate);
                     population = FillLinkCapacitiesForNewSolutions(population);
 
-                    Console.WriteLine("Cost of generation: " + bestSolutionOfGeneration.NetworkCost);
-                    Console.WriteLine("Cost of best solution: " + bestSolution.NetworkCost);
+                    Console.WriteLine("Koszt generacji: " + bestSolutionOfGeneration.NetworkCost);
+                    Console.WriteLine("Koszt najlepszego rozwiązania: " + bestSolution.NetworkCost);
 
                     // nie możemy w tym momencie wybrac najlepszych bo nie są obliczone koszta (dlatego przed mutacja)
                 }
-                Console.WriteLine("Cost of best solution: " + bestSolution.NetworkCost);
+                Console.WriteLine("Koszt najlepszego rozwiązania: " + bestSolution.NetworkCost);
                 return bestSolution;
             }
 
         public List<SolutionModel> GetInitialRandomPopulation(int numberOfChromosomes, double seed)
         {
-            var allCombinations = new List<List<SolutionModel>>();//dokonczyc
+            var allCombinations = new List<List<SolutionModel>>();
 
             foreach(var demand in networkModel.Demands)
             {
@@ -143,7 +146,6 @@ namespace DDAPandDAPsolver.Algorithms
                 SolutionModel chromosome = new SolutionModel(new Dictionary<PModel, int>());
                 for(int j=0; j<allCombinations.Count; j++)
                 {
-                    //ten if moze nie byc dobry ale przynajmniej nie wywala sie program teraz
                     if(allCombinations.ElementAt(j).Count == 0)
                     {
                         allCombinations.RemoveAt(j);
@@ -225,7 +227,7 @@ namespace DDAPandDAPsolver.Algorithms
             endTime = Environment.TickCount + maxTime * 1000;
             while (ComputeStopCriterion())
             {
-                currentGeneration++;
+                CurrentGeneration++;
                 SolutionModel bestSolutionOfGeneration = new SolutionModel(new Dictionary<PModel, int>());
                 bestSolutionOfGeneration.CapacityExceededLinksNumber = int.MaxValue;
 
@@ -257,6 +259,7 @@ namespace DDAPandDAPsolver.Algorithms
                 {
                     bestSolution = bestSolutionOfGeneration;
                     currentNumberOfContinuousNonBetterSolutions = 0;
+                    if (bestSolution.CapacityExceededLinksNumber == 0) return bestSolution;
                 } else
                 {
                     currentNumberOfContinuousNonBetterSolutions++;
@@ -268,9 +271,9 @@ namespace DDAPandDAPsolver.Algorithms
                 population = FillLinkCapacitiesForNewSolutions(population);
 
                 // nie możemy w tym momencie wybrac najlepszych bo nie są obliczone koszta (dlatego przed mutacja)
-                Console.WriteLine("Overload of generation " + currentGeneration + ": " + bestSolutionOfGeneration.CapacityExceededLinksNumber);
+                Console.WriteLine("Przeciążenie generacji " + CurrentGeneration + ": " + bestSolutionOfGeneration.CapacityExceededLinksNumber);
             }
-            Console.WriteLine("Overload of best solution: " + bestSolution.CapacityExceededLinksNumber);
+            Console.WriteLine("Przeciążenie najlepszego rozwiązania: " + bestSolution.CapacityExceededLinksNumber);
             return bestSolution;
         }
 
@@ -284,7 +287,7 @@ namespace DDAPandDAPsolver.Algorithms
            List<SolutionModel> list = solutions.OrderBy(o => o.CapacityExceededLinksNumber).ToList().GetRange(0, subListEnd);
 
            // Dopełniamy najlepszymi, aby populacja nie zmalała
-           list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); // chyba jest git
+           list.AddRange(list0.GetRange(0, solutions.Count - subListEnd));
 
            return list;
 
@@ -298,12 +301,11 @@ namespace DDAPandDAPsolver.Algorithms
            List<SolutionModel> list0 = solutions.OrderBy(o=>o.NetworkCost).ToList();
            List<SolutionModel> list = solutions.OrderBy(o => o.NetworkCost).ToList().GetRange(0, subListEnd);
            // Dopełniamy najlepszymi, aby populacja nie zmalała
-           list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); // chyba jest git
+           list.AddRange(list0.GetRange(0, solutions.Count - subListEnd)); 
 
            return list;
         }
 
-        //TODO
         private List<SolutionModel> Crossover(List<SolutionModel> parents, double seed, float probabilityOfCrossover)
         {
             var children = new List<SolutionModel>();
@@ -320,10 +322,7 @@ namespace DDAPandDAPsolver.Algorithms
                 children.AddRange(CrossParents(parents[index1], parents[index2], probabilityOfCrossover, seed));
                 parents.RemoveAt(index1);
                 parents.RemoveAt(index2);
-                /*children.AddRange(CrossParents(parents.RemoveAt(random.Next(parents.Count)),
-                                parents.RemoveAt(random.Next(parents.Count)),
-                                probabilityOfCrossover, seed)
-                                );*/
+
             }
             return children;
         }
@@ -374,7 +373,6 @@ namespace DDAPandDAPsolver.Algorithms
             return solutions;
         }
 
-        //TODO
         private List<SolutionModel> Mutation(List<SolutionModel> population, long seed, float probabilityOfMutation)
         {
             var mutants = new List<SolutionModel>();
@@ -386,7 +384,6 @@ namespace DDAPandDAPsolver.Algorithms
                 if (rand < probabilityOfMutation)
                 {
                     currentMutation++;
-                    //Console.WriteLine("currentMutation: " + currentMutation);
                     var genes = new Dictionary<PModel, int>();
                     for (int j = 0; j < population.ElementAt(i).GetNumberOfGenes(); j++)
                     {
