@@ -46,7 +46,10 @@ namespace DDAPandDAPsolver.Algorithms
                 {
                     temporaryCost += _networkModel.Links.ElementAt(j).FibrePairCost * costsOfLinks.ElementAt(j);
                 }
-
+                if(costsOfLinks.Sum() == 0 )
+                {
+                    temporaryCost = double.MaxValue;
+                }
                 if (temporaryCost < finalCost)
                 {
                     finalCost = temporaryCost;

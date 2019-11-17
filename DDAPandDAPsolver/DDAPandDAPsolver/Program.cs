@@ -153,6 +153,8 @@ namespace DDAPandDAPsolver
                     }
                     Console.Write($"{item.Key.PathId} -> {item.Value};");
                 }
+                FileWriter writer = new FileWriter();
+                writer.WriteToFile(result, "DAP_" + fileName);
             }
             else
             {
@@ -188,6 +190,8 @@ namespace DDAPandDAPsolver
                     }
                     Console.Write($"{item.Key.PathId} -> {item.Value};");
                 }
+                FileWriter writer = new FileWriter();
+                writer.WriteToFile(result, "DDAP_" + fileName);
 
             }
         }
@@ -232,6 +236,9 @@ namespace DDAPandDAPsolver
                         }
                         Console.Write($"{item.Key.PathId} -> {item.Value};");
                     }
+
+                    FileWriter writer = new FileWriter();
+                    writer.WriteToFile(result, "DDAP_" + fileName);
                 }
                 else
                 {
@@ -261,7 +268,8 @@ namespace DDAPandDAPsolver
                         }
                         Console.Write($"{item.Key.PathId} -> {item.Value};");
                     }
-
+                    FileWriter writer = new FileWriter();
+                    writer.WriteToFile(result, "DAP_" + fileName);
 
                 }
             }

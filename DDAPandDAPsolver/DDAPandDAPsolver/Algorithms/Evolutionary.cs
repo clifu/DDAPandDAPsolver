@@ -84,7 +84,7 @@ namespace DDAPandDAPsolver.Algorithms
             while (ComputeStopCriterion())
             {
                 CurrentGeneration++;
-                Console.WriteLine("currentGeneration: " + CurrentGeneration);
+                Console.WriteLine("Obecna iteracja: " + CurrentGeneration);
                 SolutionModel bestSolutionOfGeneration = new SolutionModel(new Dictionary<PModel, int>());
                 bestSolutionOfGeneration.NetworkCost = Double.MaxValue;
                     
@@ -96,13 +96,17 @@ namespace DDAPandDAPsolver.Algorithms
                     for (int j = 0; j < population.ElementAt(i).LinkCapacities.Count; j++)
                     {
                         cost += networkModel.Links.ElementAt(j).FibrePairCost * costsOfLinks.ElementAt(j);
-                    }         
+                    }
+                    if(population.ElementAt(i).LinkCapacities.Sum() == 0)
+                    {
+                        cost = double.MaxValue;
+                    }
                     population.ElementAt(i).NetworkCost = cost;
 
 
                     if (population.ElementAt(i).NetworkCost < bestSolutionOfGeneration.NetworkCost)
                     {
-                        bestSolutionOfGeneration = population.ElementAt(i);
+                        bestSolutionOfGeneration = population.ElementAt(i);                       
                     }
 
                 }
@@ -110,8 +114,6 @@ namespace DDAPandDAPsolver.Algorithms
                     {
                         bestSolution = bestSolutionOfGeneration;
                         currentNumberOfContinuousNonBetterSolutions = 0;
-                    if (bestSolution.NetworkCost == 0)
-                    { return bestSolution; };
                 } else
                     {
                         currentNumberOfContinuousNonBetterSolutions++;
@@ -173,6 +175,7 @@ namespace DDAPandDAPsolver.Algorithms
                 int rand = random.Next(routingPossibilities.Count);
                 routingPossibilities.ElementAt(rand).LinkCapacities = linksCapacities.ElementAt(rand);
                 list.Add(routingPossibilities.ElementAt(rand));
+
             }
             Console.WriteLine("list.Count: " + list.Count);
             return list;
@@ -235,6 +238,7 @@ namespace DDAPandDAPsolver.Algorithms
                 {
                     int k = 0;
                     var maxValues = new List<int>();
+
                     for (int j = 0; j < population.ElementAt(i).LinkCapacities.Count; j++)
                     {
                         maxValues.Add(Math.Max(0, population.ElementAt(i).LinkCapacities.ElementAt(j) - networkModel.Links.ElementAt(j).NbOfFibrePairs));
