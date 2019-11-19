@@ -132,7 +132,7 @@ namespace DDAPandDAPsolver
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                var result = evolutionary.ComputeDAP();
+                var result = evolutionary.RunDAP();
 
                 stopWatch.Stop();
                 Console.WriteLine($"Liczba iteracji: {evolutionary.CurrentGeneration}");
@@ -161,14 +161,13 @@ namespace DDAPandDAPsolver
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                var result = evolutionary.ComputeDDAP();
+                var result = evolutionary.RunDDAP();
 
                 stopWatch.Stop();
                 Console.WriteLine($"Liczba iteracji: {evolutionary.CurrentGeneration}");
                 Console.WriteLine($"Czas uzyskania rozwi¹zania: {stopWatch.Elapsed}");
                 Console.WriteLine($"Koszt DDAP: {result.NetworkCost}");
                 int demandId;
-                //Coœ z plikiem jest nie tak i wywala dlatego ten if bo jest rozwi¹nie bez ¿adnej wartoœci w liœcie
                 if (result.XesDictionary.Count > 0)
                 {
                      demandId = result.XesDictionary.ElementAt(0).Key.DemandId;
